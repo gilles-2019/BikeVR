@@ -1,4 +1,5 @@
 # BikeVR
+local fork to work
 Investigating VR + Biking using google street view data and potentially ant+ bluetooth devices
 
 ## NOTICE
