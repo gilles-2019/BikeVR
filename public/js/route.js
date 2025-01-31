@@ -1,4 +1,4 @@
-var directionsService = new google.maps.DirectionsService();
+//var directionsService = new google.maps.DirectionsService();
 var minDist = 25;
 
 var autoMove = false;
@@ -28,7 +28,7 @@ var endLocButton = document.getElementById('endLoc');
 
 if (directionsButton) directionsButton.addEventListener('click', () => customRoute());
 if (startButton) startButton.addEventListener('click', () => startRoute());
-if (backButton) backButton.addEventListener('click', () => window.location.href = '/route.html');
+if (backButton) backButton.addEventListener('click', () => window.location.href = './route.html');
 
 if (startLocButton) startLocButton.addEventListener('click', () => navigator.geolocation.getCurrentPosition(location => {
     start.value = location.coords.latitude + ", " + location.coords.longitude;
@@ -38,6 +38,9 @@ if (endLocButton) endLocButton.addEventListener('click', () => navigator.geoloca
     end.value = location.coords.latitude + ", " + location.coords.longitude;
 }));
 
+
+
+/*
 if (start) startAutocomplete = new google.maps.places.Autocomplete(start);
 if (end) endAutocomplete = new google.maps.places.Autocomplete(end);
 if (start && end && playToggle) {
@@ -47,18 +50,20 @@ if (start && end && playToggle) {
         velocity = autoMove ? defaultSpeed : 0;
         playToggle.textContent = autoMove ? "Autoplay: True" : "Autoplay: False";
     });
-}
 
+}
+*/
 
 var mapElem = document.getElementById('map');
 if (mapElem) {
-    var map = new google.maps.Map(mapElem, {
-        zoom: 4,
-        center: { lat: 39.50, lng: -98.35 } // center of us
-    });
-    
+    const map = L.map('map').setView([39.5, -98.35], 4); // center of US
+	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
     var delta = 100; // milliseconds
-    
+   
     if (start && end) {
         customRoute();
         setInterval(function () {
@@ -70,7 +75,35 @@ if (mapElem) {
             }
         }, delta);
     }
+    
+
 }
+
+
+function createButton(label, container) {
+    var btn = L.DomUtil.create('button', '', container);
+    btn.setAttribute('type', 'button');
+    btn.innerHTML = label;
+    return btn;
+}
+
+
+map.on('click', function(e) {
+    var container = L.DomUtil.create('div'),
+        startBtn = createButton('Start from this location', container),
+        destBtn = createButton('Go to this location', container);
+
+    L.popup()
+        .setContent(container)
+        .setLatLng(e.latlng)
+        .openOn(map);
+});
+
+
+L.DomEvent.on(destBtn, 'click', function() {
+    control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+    map1.closePopup();
+});
 
 function customRoute(customStart, customEnd, callback) {
     if ((customStart && customEnd) || (start.value && start.value.length > 0 && end.value && end.value.length > 0)) {
@@ -80,18 +113,18 @@ function customRoute(customStart, customEnd, callback) {
             travelMode: 'DRIVING' // May or may not have luck with street view this way
         };
 
-        getRoute(request, callback);
+       // getRoute(request, callback);
     }
 }
 
 function defaultRoute(callback) {
     var request = {
-        origin: "40 E Dayton St, Madison, WI",
-        destination: "1 W Dayton St, Madison WI",
+        origin: "1500 rue Meunier, Longueuil, QC",
+        destination: "5660 boul Cousineau, Longueuil, QC",
         travelMode: 'DRIVING' // May or may not have luck with street view this way
     };
 
-    getRoute(request, callback);
+    //getRoute(request, callback);
 }
 
 function startRoute() {
@@ -160,7 +193,7 @@ function checkSphere(index) {
         }
     }
 }
-
+/*
 function getRoute(request, callback) {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(null);
@@ -279,4 +312,6 @@ function getRoute(request, callback) {
             if (callback) callback();
         }
     });
+
 }
+    */
